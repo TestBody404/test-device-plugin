@@ -1,0 +1,27 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: test-fuse
+  annotations:
+    container.apparmor.security.beta.kubernetes.io/test-fuse: localhost/docker-fuse 
+spec:
+  restartPolicy: OnFailure
+  imagePullSecrets:
+  - name: registry-secret
+  containers:
+  - image: testbody404/ascend-manager:test-sshfs
+    name: test-fuse 
+    command:
+      - /bin/bash
+      - -c
+      - |2-
+        mkdir /mnt/test
+        echo "root\n" | sshfs -o allow_other root@10.0.0.62:/root
+        sleep 10000
+    resources:
+      limits:
+        huawei.com/ascend-310: 1
+    securityContext:
+      capabilities:
+        add:
+        - SYS_ADMIN

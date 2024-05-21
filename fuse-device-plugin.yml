@@ -1,0 +1,30 @@
+apiVersion: extensions/v1beta1
+kind: DaemonSet
+metadata:
+  name: ascend-manager-daemonset
+  namespace: kube-system
+spec:
+  template: 
+    metadata:
+      labels:
+        name: Ascend-device-plugin-ds
+    spec:
+      hostNetwork: true
+      nodeSelector:
+        accelerator: huawei-Ascend310
+      containers:
+      - image: testbody404/ascend-manager:v1.0
+        name: ascend-manager-ctr
+        securityContext:
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop: ["ALL"]
+        volumeMounts:
+          - name: device-plugin
+            mountPath: /var/lib/kubelet/device-plugins
+      volumes:
+        - name: device-plugin
+          hostPath:
+            path: /var/lib/kubelet/device-plugins
+      imagePullSecrets:
+        - name: registry-secret
